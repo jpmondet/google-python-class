@@ -46,42 +46,55 @@ import sys
 
 
 def mimic_dict(filename):
-  """Returns mimic dict mapping each word to list of words which follow it."""
-  wordlist = []
-  with open(filename, 'r') as file :
-      wordlist = file.read().split()
-  dict_mimic = {}
-  index = 0
-  for word in wordlist:
-    if dict_mimic.get(word):
-      if (index + 1) < len(wordlist):
-        following_words = dict_mimic.get(word)
-        following_words.append(wordlist[index + 1].lower())
-        dict_mimic[word.lower()] = following_words         
-    else:
-      if index + 1 < len(wordlist):
-        dict_mimic[word.lower()] = [wordlist[index+1].lower()]
-      else:
-        dict_mimic[word.lower()] = []        
-    index += 1
-  return dict_mimic
+    """Returns mimic dict mapping each word to list of words which follow it."""
+    wordlist = []
+    with open(filename, 'r') as file:
+        wordlist = file.read().split()
+    dict_mimic = {'': [wordlist[0].lower()]}
+    index = 0
+    for word in wordlist:
+        if dict_mimic.get(word):
+            if (index + 1) < len(wordlist):
+                following_words = dict_mimic.get(word)
+                if wordlist[index + 1].isalpha():
+                    following_words.append(wordlist[index + 1].lower())
+                else:
+                    following_words.append('')
+                dict_mimic[word.lower()] = following_words
+        else:
+            if index + 1 < len(wordlist):
+                if wordlist[index + 1].isalpha():
+                    dict_mimic[word.lower()] = [wordlist[index+1].lower()]
+                else:
+                    dict_mimic[word.lower()] = ['']
+            else:
+                dict_mimic[word.lower()] = ['']
+        index += 1
+    return dict_mimic
 
 
 def print_mimic(mimic_dict, word):
-  """Given mimic dict and start word, prints 200 random words."""
-  # +++your code here+++
-  return
-
+    """Given mimic dict and start word, prints 200 random words."""
+    new_list = []
+    for index in range(200):
+        following_words = mimic_dict[word]
+        if len(following_words) > 1:
+            random_index = int(random.random() * 100) % len(following_words) - 1
+            new_list.append(following_words[random_index])
+            word = following_words[random_index]
+        elif len(following_words) == 1:
+            new_list.append(following_words[0])
+            word = following_words[0]
+    print(' '.join(new_list))
 
 # Provided main(), calls mimic_dict() and mimic()
 def main():
-  if len(sys.argv) != 2:
-    print 'usage: ./mimic.py file-to-read'
-    sys.exit(1)
-
-  dict = mimic_dict(sys.argv[1])
-  print_mimic(dict, '')
+    if len(sys.argv) != 2:
+        print('usage: ./mimic.py file-to-read')
+        sys.exit(1)
+    dictr = mimic_dict(sys.argv[1])
+    print_mimic(dictr, '')
 
 
 if __name__ == '__main__':
-  main()
+    main()
